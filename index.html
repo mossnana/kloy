@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Kloy Kloy</title>
+    <style>
+        body,
+        textarea {
+            font-size: 14pt;
+            font-family: sans-serif;
+            width: 700px;
+            height: 100px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            font-size: 16pt;
+            text-align: center;
+            margin: 20px auto;
+        }
+
+        textarea {
+            display: block;
+            width: 100%;
+            padding: 1em;
+        }
+
+        button {
+            display: block;
+            padding: 1em;
+            margin: 20px auto;
+        }
+
+        #output {
+            font-size: 16pt;
+            white-space: pre-wrap;
+        }
+    </style>
+    <script>
+        function download(title, csv) {
+            const hiddenElement = document.createElement('a')
+            hiddenElement.href = 'data:text/csv;charset=utf-8, ' + encodeURI(csv)
+            hiddenElement.target = '_blank'
+            hiddenElement.download = `${title}.csv`
+            hiddenElement.click()
+        }
+        function handleClick() {
+            const filename = document.getElementById('filename')
+            const lyric = document.getElementById('input')
+            const input = lyric.value.replace(/[ ()\ \n]/gim, '')
+            lyric.value = input
+            const lyricLength = lyric.value.length || 0
+            const selector = window.getSelection()
+            const words = {}
+            let startPos = 0
+            let endPos = 0
+            let csv = 'Word,Count\n'
+
+            lyric.focus()
+            lyric.selectionStart = 0
+            lyric.selectionEnd = 0
+            while (endPos !== lyricLength) {
+                selector.modify('move', 'forward', 'word')
+                endPos = lyric.selectionEnd
+                const word = lyric.value.substring(startPos, endPos)
+                const count = words[word] || 0
+                words[word] = count + 1
+                startPos = endPos
+            }
+
+            for (const word in words) {
+                csv += `${word},${words[word]}\n`
+            }
+
+            download(filename.value, csv)
+        }
+
+    </script>
+</head>
+
+<body>
+    <input placeholder="Enter title" id="filename" lang="th"></input>
+    <textarea placeholder="Enter lyric" id="input" lang="th"></textarea>
+    <button id="split" onclick="handleClick()">↓ Split words ↓</button>
+</body>
+</html>
