@@ -69,7 +69,11 @@ func manageData(file *os.File, filename string) *map[string]string {
 		if err != nil {
 			log.Printf("Error in file %s\n", file.Name())
 		}
-		data[record[0]] = record[1]
+		if len(record) >= 2 {
+			data[record[0]] = record[1]
+		} else {
+			data[record[0]] = "0"
+		}
 		data["title"] = songTitle
 		if !WORDSET[record[0]] {
 			WORDSET[record[0]] = true
